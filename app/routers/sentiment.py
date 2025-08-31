@@ -1,22 +1,15 @@
 from fastapi import APIRouter
 from app.schemas import TextIn, SentimentOut
+from transformers import pipeline
 
 router = APIRouter(prefix="/sentiment", tags=["nlp"])
 
-POS = {"good","great","love","excellent","happy","awesome","amazing","nice","wonderful"}
-NEG = {"bad","terrible","hate","awful","sad","horrible","poor","worst","angry"}
-
-def score_rule(text: str) -> float:
-    words = {w.strip(".,!?;:").lower() for w in text.split()}
-    pos = len(words & POS)
-    neg = len(words & NEG)
-    if pos == neg == 0:
-        return 0.5
-    total = pos + neg
-    return (pos / total) if total else 0.5
+# load once at startup
+_nlp = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
 @router.post("", response_model=SentimentOut)
 def sentiment(payload: TextIn):
-    s = score_rule(payload.text)
-    label = "positive" if s >= 0.5 else "negative"
-    return {"label": label, "score": float(s)}
+    res = _nlp(payload.text)[0]  # {'label': 'POSITIVE', 'score': 0.997...}
+    label = res["label"].lower()
+    score = float(res["score"])
+    return {"label": label, "score": score}
