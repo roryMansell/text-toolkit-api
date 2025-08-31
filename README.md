@@ -18,7 +18,7 @@ A simple **FastAPI-based microservice** for text cleaning, sentiment analysis, a
 
 ## ✨ Features
 - **/clean** → lowercases + trims text.  
-- **/sentiment** → returns positive/negative sentiment (HuggingFace).  
+- **/sentiment** → returns positive/negative sentiment (Keyword-based).  
 - **/similarity** → cosine similarity between two texts.  
 - Auto-generated API docs at `/docs`.  
 - Frontend with simple HTML/JS for quick testing.  
